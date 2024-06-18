@@ -35,3 +35,4 @@ This code was created as a workaround for the absence of the QML-based Qt Virtua
 
 This code was developed in half a day and is currently on pause before further upgrades.
 
+![image](https://github.com/G-Bottollier/Qt-Keyboard/assets/150695762/8329a3a5-e292-4b1a-a5ca-f0819de74269)
