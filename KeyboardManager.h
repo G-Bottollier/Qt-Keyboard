@@ -18,8 +18,12 @@
 #define KEYBOARD_AZERTY   1
 #define KEYBOARD_NUMERIC  2
 
+#define SHIFT_DISABLE     0
+#define SHIFT_ENABLE      1
+#define SHIFT_CAPS        2
+
 /* class definition */
-class InputKey;
+class KeyButton;
 
 /**
   * @defgroup KeyboardManager KeyboardManager
@@ -52,49 +56,124 @@ class KeyboardManager : public QWidget
 {
   Q_OBJECT
 
+  #pragma region MEMBERS
+
   private:
-    int                          m_CurrentLayout = -1;
-    QVBoxLayout*                 m_MainLayout    = nullptr;
+    int                          m_CurrentLayout   = 0;
+    int                          m_CurrentShift    = 0;
+    int                          m_CurrentLanguage = 0;
+    int                          m_CursorPosition  = 0;
+    QVBoxLayout*                 m_MainLayout      = nullptr;
+
+    QString                      m_KeySequence;
 
     QString                      m_TooltipStyle;
-    QWidget*                     m_TooltipWidget = nullptr;
-    QLabel*                      m_TooltipLabel  = nullptr;
+    QWidget*                     m_TooltipWidget   = nullptr;
+    QLabel*                      m_TooltipLabel    = nullptr;
 
     QMap<int, QHBoxLayout*>      m_Layouts;
     QMap<int, QList<QList<int>>> m_KeyLayouts;
-    QMap<int, QPushButton*>      m_Buttons;
+    QMap<int, KeyButton*>        m_Buttons;
     QList<int>                   m_MiscKeys;
 
+  #pragma endregion
+
+  #pragma region SETUP
+
+  private:
     void SetupUI();
     void SetupEvent();
     void SetupLayouts();
 
-    void UpdateLayout(int layout);
-    void ClearLayout();
-    void AddLayout(int rowCount);
-    void FillKeys(QList<QList<int>>& keysByRow);
+  #pragma endregion
 
+  #pragma region INIT
+
+  private:
+    void InitButton(int key);
+    void InitKeyBackspace();
+    void InitKeyReturn();
+    void InitKeyShift();
+    void InitKeyClose();
+    void InitKeyNumLock();
+    void InitKeySpace();
+    void InitKeySettings();
+    void InitKeyLeft();
+    void InitKeyRight();
+
+  #pragma endregion
+
+  #pragma region UPDATE
+
+  private:
+    void UpdateLayout(int layout);
+    void UpdateTextKeys();
+    void UpdateShiftIcons();
+
+  #pragma endregion
+
+  #pragma region LAYOUT
+
+  private:
+    void FillKeys(QList<QList<int>>& keysByRow);
+    void AddLayout(int rowCount);
+    void ClearLayout();
     QHBoxLayout* GetRowLayout();
-    QPushButton* GetButton(int key);
+
+  public:
+    void SetKeyboardLayout(int layout);
+
+  #pragma endregion
+
+  #pragma region EVENTS
 
   protected:
     void resizeEvent(QResizeEvent* event) override;
 
+  #pragma endregion
+
   private:
-    // Constructor
     explicit KeyboardManager(QObject* parent = nullptr);
 
   public:
-    // Destructor
     ~KeyboardManager();
 
     static KeyboardManager* Instance();
 
-    void SetKeyboardLayout(int layout);
+  #pragma region KEY EVENTS
 
   public slots:
     void KeyPressed();
     void KeyClicked();
+    void MiscKeyClicked(int key);
+
+    /* Keys clicked */
+    void KeyBackspaceClicked();
+    void KeyReturnClicked();
+    void KeyShiftClicked();
+    void KeyCloseClicked();
+    void KeyLayoutClicked();
+    void KeySpaceClicked();
+    void KeySettingsClicked();
+    void KeyLeftClicked();
+    void KeyRightClicked();
+
+  #pragma endregion
+
+  signals:
+    void SendKeySequence(QString str);
 };
+
+#pragma region KEY BUTTON
+
+class KeyButton : public QPushButton
+{
+  Q_OBJECT
+
+  public:
+    QSize	minimumSizeHint() const override;
+};
+
+#pragma endregion
 
 #endif // KEYBOARDMANAGER_H
